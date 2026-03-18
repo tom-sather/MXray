@@ -392,6 +392,132 @@
       "patterns": [".plingest.com"]
     },
     {
+      "name": "Localhost MX",
+      "family": "localhost",
+      "category": "Misconfigured MX",
+      "risk_tier": "high",
+      "risk_weight": 40,
+      "flags": ["misconfigured", "invalid-mx"],
+      "patterns": ["localhost"]
+    },
+    {
+      "name": "OneB",
+      "family": "oneb.net",
+      "category": "Suspicious MX",
+      "risk_tier": "high",
+      "risk_weight": 34,
+      "flags": ["suspicious", "suppression-cluster", "no-auth-heavy"],
+      "patterns": [".oneb.net"]
+    },
+    {
+      "name": "FR.NF",
+      "family": "fr.nf",
+      "category": "Suspicious MX",
+      "risk_tier": "high",
+      "risk_weight": 34,
+      "flags": ["suspicious", "suppression-cluster", "no-auth-heavy"],
+      "patterns": [".fr.nf"]
+    },
+    {
+      "name": "XGLLLLI",
+      "family": "xglllli.com",
+      "category": "Suspicious MX",
+      "risk_tier": "high",
+      "risk_weight": 34,
+      "flags": ["suspicious", "suppression-cluster"],
+      "patterns": [".xglllli.com"]
+    },
+    {
+      "name": "Mailcore",
+      "family": "mailcore.email",
+      "category": "Suspicious MX",
+      "risk_tier": "high",
+      "risk_weight": 34,
+      "flags": ["suspicious", "suppression-cluster", "no-auth-heavy"],
+      "patterns": [".mailcore.email"]
+    },
+    {
+      "name": "Discard.Email",
+      "family": "discard.email",
+      "category": "Disposable",
+      "risk_tier": "high",
+      "risk_weight": 42,
+      "flags": ["disposable", "temporary", "suppression-cluster"],
+      "patterns": [".discard.email"]
+    },
+    {
+      "name": "Darkvilto",
+      "family": "darkvilto.biz",
+      "category": "Suspicious MX",
+      "risk_tier": "high",
+      "risk_weight": 34,
+      "flags": ["suspicious", "suppression-cluster"],
+      "patterns": [".darkvilto.biz"]
+    },
+    {
+      "name": "Infos.ST",
+      "family": "infos.st",
+      "category": "Suspicious MX",
+      "risk_tier": "high",
+      "risk_weight": 32,
+      "flags": ["suspicious", "suppression-cluster"],
+      "patterns": [".infos.st"]
+    },
+    {
+      "name": "TryNinja",
+      "family": "tryninja.io",
+      "category": "Forwarding",
+      "risk_tier": "elevated",
+      "risk_weight": 20,
+      "flags": ["forwarding", "privacy-mail", "suppression-cluster"],
+      "patterns": [".tryninja.io"]
+    },
+    {
+      "name": "HostedEmail",
+      "family": "hostedemail.com",
+      "category": "Suspicious MX",
+      "risk_tier": "high",
+      "risk_weight": 34,
+      "flags": ["suspicious", "suppression-cluster"],
+      "patterns": [".hostedemail.com"]
+    },
+    {
+      "name": "NameBright Mail",
+      "family": "namebrightmail.com",
+      "category": "Hosting Mail",
+      "risk_tier": "elevated",
+      "risk_weight": 18,
+      "flags": ["registrar-mail", "suppression-cluster"],
+      "patterns": [".namebrightmail.com"]
+    },
+    {
+      "name": "HubbleHost",
+      "family": "hubblehost.com",
+      "category": "Disposable",
+      "risk_tier": "high",
+      "risk_weight": 42,
+      "flags": ["disposable", "trap-adjacent", "suppression-cluster"],
+      "patterns": [".hubblehost.com"]
+    },
+    {
+      "name": "BurnServer",
+      "family": "burnserver.com",
+      "category": "Disposable",
+      "risk_tier": "high",
+      "risk_weight": 42,
+      "flags": ["disposable", "temporary", "suppression-cluster"],
+      "patterns": [".burnserver.com"]
+    },
+    {
+      "name": "CSCDNS Mail",
+      "family": "cscdns.net",
+      "category": "Hosting Mail",
+      "risk_tier": "elevated",
+      "risk_weight": 18,
+      "flags": ["managed-dns", "suppression-cluster"],
+      "patterns": [".cscdns.net"]
+    },
+    {
       "name": "Erinn",
       "family": "erinn.biz",
       "category": "Trap Network",
