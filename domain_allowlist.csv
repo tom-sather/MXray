@@ -1,3 +1,38 @@
 # One domain per line to force lower risk / manual trust overrides.
 # Example:
 # legitimate-but-weird-client-domain.example
+ad.unc.edu
+alumni.gettysburg.edu
+alumni.jh.edu
+army.mil
+baruchmail.cuny.edu
+bop.gov
+childrens.harvard.edu
+csuchico.edu
+culinary.edu
+dm.duke.edu
+dupage.edu
+email.arizona.edu
+email.davenport.edu
+email.unc.edu
+falcon.bentley.edu
+global.t-bird.edu
+grad.bryant.edu
+gwu.edu
+jacks.sdstate.edu
+jsei.ucla.edu
+law.gwu.edu
+lawmail.mercer.edu
+lehman.cuny.edu
+mail.utexas.edu
+my.erau.edu
+oneonta.edu
+semo.edu
+student.ccc.edu
+student.fullsail.edu
+student.ie.edu
+sycamores.indstate.edu
+u.boisestate.edu
+unlv.nevada.edu
+vols.utk.edu
+zips.uakron.edu
