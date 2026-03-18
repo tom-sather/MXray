@@ -1,0 +1,14 @@
+test@example.com
+admin@google.com
+info@microsoft.com
+user@yahoo.com
+support@github.com
+contact@amazon.com
+help@netflix.com
+sales@apple.com
+info@spotify.com
+admin@facebook.com
+example.com
+google.com
+microsoft.com
+github.com

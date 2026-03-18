@@ -1,0 +1,3 @@
+# One domain per line to force known-bad overrides.
+# Example:
+# obvioustrapdomain.example

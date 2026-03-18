@@ -1,0 +1,19 @@
+# macOS / Python noise
+.DS_Store
+__pycache__/
+.cache/
+*.pyc
+
+# Local logs
+*.log
+
+# Generated analysis outputs
+*_analysis_*.csv
+*_domain_analysis_*.csv
+*_email_analysis_*.csv
+*_review_queue_*.csv
+*_cluster_summary_*.csv
+*_cohort_summary_*.json
+
+# Local run history
+mxray_history.jsonl

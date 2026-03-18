@@ -1,0 +1,314 @@
+{
+  "risk_band_thresholds": {
+    "high": 60,
+    "medium": 30
+  },
+  "mx_provider_rules": [
+    {
+      "name": "Proofpoint",
+      "family": "proofpoint.com",
+      "category": "Security Gateway",
+      "risk_tier": "low",
+      "risk_weight": 0,
+      "flags": ["gateway", "enterprise"],
+      "patterns": [".proofpoint.com", ".ppe-hosted.com", ".pphosted.com", ".ppsmtp.com"]
+    },
+    {
+      "name": "Mimecast",
+      "family": "mimecast.com",
+      "category": "Security Gateway",
+      "risk_tier": "low",
+      "risk_weight": 0,
+      "flags": ["gateway", "enterprise"],
+      "patterns": [".mimecast.com"]
+    },
+    {
+      "name": "Barracuda",
+      "family": "barracudanetworks.com",
+      "category": "Security Gateway",
+      "risk_tier": "low",
+      "risk_weight": 0,
+      "flags": ["gateway"],
+      "patterns": [".barracudanetworks.com"]
+    },
+    {
+      "name": "Cisco IronPort",
+      "family": "iphmx.com",
+      "category": "Security Gateway",
+      "risk_tier": "low",
+      "risk_weight": 0,
+      "flags": ["gateway"],
+      "patterns": [".iphmx.com", ".ironport.com"]
+    },
+    {
+      "name": "Google",
+      "family": "google.com",
+      "category": "Mailbox Provider",
+      "risk_tier": "low",
+      "risk_weight": 0,
+      "flags": ["major-provider"],
+      "patterns": [".google.com", ".googlemail.com", ".gmail.com", "aspmx.l.google.com"]
+    },
+    {
+      "name": "Microsoft",
+      "family": "outlook.com",
+      "category": "Mailbox Provider",
+      "risk_tier": "low",
+      "risk_weight": 0,
+      "flags": ["major-provider"],
+      "patterns": [".outlook.com", ".office365.com", ".hotmail.com", ".live.com", ".msn.com", ".microsoft.com"]
+    },
+    {
+      "name": "Yahoo",
+      "family": "yahoodns.net",
+      "category": "Mailbox Provider",
+      "risk_tier": "low",
+      "risk_weight": 0,
+      "flags": ["major-provider"],
+      "patterns": [".yahoo.com", ".ymail.com", ".rocketmail.com", ".yahoodns.net"]
+    },
+    {
+      "name": "Apple",
+      "family": "icloud.com",
+      "category": "Mailbox Provider",
+      "risk_tier": "low",
+      "risk_weight": 0,
+      "flags": ["major-provider"],
+      "patterns": [".icloud.com", ".me.com", ".mac.com", ".apple.com"]
+    },
+    {
+      "name": "Zoho",
+      "family": "zoho.com",
+      "category": "Mailbox Provider",
+      "risk_tier": "low",
+      "risk_weight": 0,
+      "flags": ["hosted-mail"],
+      "patterns": [".zoho.com", ".zohomail.com"]
+    },
+    {
+      "name": "Fastmail",
+      "family": "messagingengine.com",
+      "category": "Mailbox Provider",
+      "risk_tier": "low",
+      "risk_weight": 0,
+      "flags": ["hosted-mail"],
+      "patterns": [".fastmail.com", ".messagingengine.com"]
+    },
+    {
+      "name": "ProtonMail",
+      "family": "protonmail.com",
+      "category": "Mailbox Provider",
+      "risk_tier": "contextual",
+      "risk_weight": 4,
+      "flags": ["privacy-mail"],
+      "patterns": [".protonmail.com", ".protonmail.ch", ".proton.me", ".pm.me"]
+    },
+    {
+      "name": "SimpleLogin",
+      "family": "simplelogin.co",
+      "category": "Forwarding",
+      "risk_tier": "elevated",
+      "risk_weight": 18,
+      "flags": ["forwarding", "aliasing"],
+      "patterns": [".simplelogin.co"]
+    },
+    {
+      "name": "ForwardEmail",
+      "family": "forwardemail.net",
+      "category": "Forwarding",
+      "risk_tier": "elevated",
+      "risk_weight": 22,
+      "flags": ["forwarding", "aliasing"],
+      "patterns": [".forwardemail.net"]
+    },
+    {
+      "name": "Cloudflare Email Routing",
+      "family": "mx.cloudflare.net",
+      "category": "Forwarding",
+      "risk_tier": "elevated",
+      "risk_weight": 20,
+      "flags": ["forwarding", "routing"],
+      "patterns": ["route1.mx.cloudflare.net", "route2.mx.cloudflare.net", "route3.mx.cloudflare.net"]
+    },
+    {
+      "name": "Mailgun",
+      "family": "mailgun.org",
+      "category": "Transactional",
+      "risk_tier": "contextual",
+      "risk_weight": 4,
+      "flags": ["transactional"],
+      "patterns": [".mailgun.org"]
+    },
+    {
+      "name": "SendGrid",
+      "family": "sendgrid.net",
+      "category": "Transactional",
+      "risk_tier": "contextual",
+      "risk_weight": 4,
+      "flags": ["transactional"],
+      "patterns": [".sendgrid.net"]
+    },
+    {
+      "name": "Amazon SES",
+      "family": "amazonses.com",
+      "category": "Transactional",
+      "risk_tier": "contextual",
+      "risk_weight": 4,
+      "flags": ["transactional", "cloud"],
+      "patterns": [".amazonses.com", ".inbound-smtp."]
+    },
+    {
+      "name": "AWS WorkMail",
+      "family": "awsapps.com",
+      "category": "Mailbox Provider",
+      "risk_tier": "contextual",
+      "risk_weight": 3,
+      "flags": ["cloud-mail"],
+      "patterns": [".awsapps.com"]
+    },
+    {
+      "name": "GoDaddy",
+      "family": "secureserver.net",
+      "category": "Hosting Mail",
+      "risk_tier": "contextual",
+      "risk_weight": 6,
+      "flags": ["shared-hosting"],
+      "patterns": [".secureserver.net"]
+    },
+    {
+      "name": "Namecheap Private Email",
+      "family": "privateemail.com",
+      "category": "Hosting Mail",
+      "risk_tier": "contextual",
+      "risk_weight": 8,
+      "flags": ["shared-hosting", "registrar-mail"],
+      "patterns": [".namecheap.com", ".privateemail.com", ".registrar-servers.com"]
+    },
+    {
+      "name": "IONOS",
+      "family": "ionos.com",
+      "category": "Hosting Mail",
+      "risk_tier": "contextual",
+      "risk_weight": 6,
+      "flags": ["shared-hosting"],
+      "patterns": [".ionos.com", ".kundenserver.de", ".1and1.com"]
+    },
+    {
+      "name": "OVH",
+      "family": "ovh.net",
+      "category": "Hosting Mail",
+      "risk_tier": "contextual",
+      "risk_weight": 5,
+      "flags": ["shared-hosting"],
+      "patterns": [".ovh.net", ".ovh.com"]
+    },
+    {
+      "name": "Rackspace",
+      "family": "emailsrvr.com",
+      "category": "Hosting Mail",
+      "risk_tier": "contextual",
+      "risk_weight": 5,
+      "flags": ["shared-hosting"],
+      "patterns": [".emailsrvr.com", ".rackspace.com"]
+    },
+    {
+      "name": "cPanel",
+      "family": "cpanel.net",
+      "category": "Hosting Mail",
+      "risk_tier": "contextual",
+      "risk_weight": 8,
+      "flags": ["shared-hosting"],
+      "patterns": [".cpanel.net"]
+    },
+    {
+      "name": "Mailinator",
+      "family": "mailinator.com",
+      "category": "Disposable",
+      "risk_tier": "high",
+      "risk_weight": 45,
+      "flags": ["disposable", "temporary"],
+      "patterns": ["mailinator.com", "mail.mailinator.com", "mail2.mailinator.com"]
+    },
+    {
+      "name": "10MinuteMail",
+      "family": "10minutemail.com",
+      "category": "Disposable",
+      "risk_tier": "high",
+      "risk_weight": 45,
+      "flags": ["disposable", "temporary"],
+      "patterns": ["10minutemail.com", "prd-smtp.10minutemail.com"]
+    },
+    {
+      "name": "Guerrilla Mail",
+      "family": "guerrillamail.com",
+      "category": "Disposable",
+      "risk_tier": "high",
+      "risk_weight": 45,
+      "flags": ["disposable", "temporary"],
+      "patterns": ["guerrillamail.com", "sharklasers.com", "grr.la"]
+    },
+    {
+      "name": "Yopmail",
+      "family": "yopmail.com",
+      "category": "Disposable",
+      "risk_tier": "high",
+      "risk_weight": 45,
+      "flags": ["disposable", "temporary"],
+      "patterns": ["yopmail.com"]
+    },
+    {
+      "name": "Mail.tm",
+      "family": "mail.tm",
+      "category": "Disposable",
+      "risk_tier": "high",
+      "risk_weight": 45,
+      "flags": ["disposable", "temporary"],
+      "patterns": ["in.mail.tm"]
+    },
+    {
+      "name": "Erinn",
+      "family": "erinn.biz",
+      "category": "Trap Network",
+      "risk_tier": "high",
+      "risk_weight": 50,
+      "flags": ["trap", "known-bad"],
+      "patterns": ["recv1.erinn.biz", "recv2.erinn.biz", "recv3.erinn.biz", "recv4.erinn.biz", "recv6.erinn.biz", "recv7.erinn.biz", "recv8.erinn.biz", "recv100.erinn.biz", "recv101.erinn.biz", "erinn.biz", "erinn-email.org"]
+    },
+    {
+      "name": "Jellyfish",
+      "family": "jellyfish.systems",
+      "category": "Trap Network",
+      "risk_tier": "high",
+      "risk_weight": 50,
+      "flags": ["trap", "known-bad"],
+      "patterns": ["mx1-hosting.jellyfish.systems", "mx2-hosting.jellyfish.systems", "mx3-hosting.jellyfish.systems"]
+    },
+    {
+      "name": "Emaildbox",
+      "family": "emaildbox.pro",
+      "category": "Trap Network",
+      "risk_tier": "high",
+      "risk_weight": 50,
+      "flags": ["trap", "known-bad"],
+      "patterns": ["mx1.emaildbox.pro", "mx2.emaildbox.pro", "mx3.emaildbox.pro", "mx4.emaildbox.pro", "mx5.emaildbox.pro"]
+    },
+    {
+      "name": "CatchServers",
+      "family": "catchservers.net",
+      "category": "Trap Network",
+      "risk_tier": "high",
+      "risk_weight": 50,
+      "flags": ["trap", "catch-all", "known-bad"],
+      "patterns": ["catchservers.net", "catchservers.com", "brushemail.com"]
+    },
+    {
+      "name": "Parking MX",
+      "family": "parking",
+      "category": "Parking",
+      "risk_tier": "high",
+      "risk_weight": 40,
+      "flags": ["parking"],
+      "patterns": ["park-mx.above.com", "sedoparking.com", "parkingcrew.net", "bodis.com", "fabulous.com"]
+    }
+  ]
+}

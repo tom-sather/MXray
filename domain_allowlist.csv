@@ -1,0 +1,3 @@
+# One domain per line to force lower risk / manual trust overrides.
+# Example:
+# legitimate-but-weird-client-domain.example
