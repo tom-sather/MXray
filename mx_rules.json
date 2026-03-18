@@ -266,6 +266,132 @@
       "patterns": ["in.mail.tm"]
     },
     {
+      "name": "AnonAddy",
+      "family": "anonaddy.me",
+      "category": "Forwarding",
+      "risk_tier": "elevated",
+      "risk_weight": 18,
+      "flags": ["forwarding", "aliasing", "privacy-mail"],
+      "patterns": [".anonaddy.me"]
+    },
+    {
+      "name": "WabblyWabble",
+      "family": "wabblywabble.com",
+      "category": "Suspicious MX",
+      "risk_tier": "high",
+      "risk_weight": 40,
+      "flags": ["suspicious", "suppression-cluster", "trap-adjacent"],
+      "patterns": [".wabblywabble.com"]
+    },
+    {
+      "name": "MailerHost",
+      "family": "mailerhost.net",
+      "category": "Suspicious MX",
+      "risk_tier": "elevated",
+      "risk_weight": 28,
+      "flags": ["suspicious", "suppression-cluster"],
+      "patterns": [".mailerhost.net"]
+    },
+    {
+      "name": "Beavis99",
+      "family": "beavis99.com",
+      "category": "Suspicious MX",
+      "risk_tier": "elevated",
+      "risk_weight": 28,
+      "flags": ["suspicious", "suppression-cluster"],
+      "patterns": [".beavis99.com"]
+    },
+    {
+      "name": "Inbound-MX",
+      "family": "inbound-mx.net",
+      "category": "Suspicious MX",
+      "risk_tier": "elevated",
+      "risk_weight": 24,
+      "flags": ["suspicious", "suppression-cluster"],
+      "patterns": [".inbound-mx.net"]
+    },
+    {
+      "name": "HostedMXServer",
+      "family": "hostedmxserver.com",
+      "category": "Suspicious MX",
+      "risk_tier": "high",
+      "risk_weight": 35,
+      "flags": ["suspicious", "suppression-cluster", "parking-adjacent"],
+      "patterns": [".hostedmxserver.com"]
+    },
+    {
+      "name": "M1BP",
+      "family": "m1bp.com",
+      "category": "Suspicious MX",
+      "risk_tier": "high",
+      "risk_weight": 34,
+      "flags": ["suspicious", "suppression-cluster"],
+      "patterns": [".m1bp.com"]
+    },
+    {
+      "name": "M2BP",
+      "family": "m2bp.com",
+      "category": "Suspicious MX",
+      "risk_tier": "high",
+      "risk_weight": 34,
+      "flags": ["suspicious", "suppression-cluster"],
+      "patterns": [".m2bp.com"]
+    },
+    {
+      "name": "EmailFake",
+      "family": "emailfake.com",
+      "category": "Disposable",
+      "risk_tier": "high",
+      "risk_weight": 45,
+      "flags": ["disposable", "temporary", "suppression-cluster"],
+      "patterns": [".emailfake.com", ".email-fake.com"]
+    },
+    {
+      "name": "Generator.Email",
+      "family": "generator.email",
+      "category": "Disposable",
+      "risk_tier": "high",
+      "risk_weight": 45,
+      "flags": ["disposable", "temporary", "suppression-cluster"],
+      "patterns": [".generator.email"]
+    },
+    {
+      "name": "MOAKT",
+      "family": "moakt.com",
+      "category": "Disposable",
+      "risk_tier": "high",
+      "risk_weight": 42,
+      "flags": ["disposable", "temporary", "suppression-cluster"],
+      "patterns": [".moakt.com"]
+    },
+    {
+      "name": "Tempm",
+      "family": "tempm.com",
+      "category": "Disposable",
+      "risk_tier": "high",
+      "risk_weight": 42,
+      "flags": ["disposable", "temporary", "suppression-cluster"],
+      "patterns": [".tempm.com"]
+    },
+    {
+      "name": "Casadorock",
+      "family": "casadorock.com",
+      "category": "Suspicious MX",
+      "risk_tier": "elevated",
+      "risk_weight": 24,
+      "flags": ["suspicious", "suppression-cluster"],
+      "patterns": [".casadorock.com"]
+    },
+    {
+      "name": "Plingest",
+      "family": "plingest.com",
+      "category": "Suspicious MX",
+      "risk_tier": "elevated",
+      "risk_weight": 24,
+      "flags": ["suspicious", "suppression-cluster"],
+      "patterns": [".plingest.com"]
+    },
+    {
       "name": "Erinn",
       "family": "erinn.biz",
       "category": "Trap Network",
