@@ -1702,216 +1702,215 @@ class EmailDomainAnalyzer:
         print(f"   📁 Output file: {output_csv}")
         print("=" * 60)
 
-        if not os.path.exists(input_file):
-            print(f"Error: File '{input_file}' not found.")
-            await self.cleanup()
-            return
+        f_in = None
+        try:
+            if not os.path.exists(input_file):
+                print(f"Error: File '{input_file}' not found.")
+                return
 
-        f_in = open(input_file, 'r', newline='', encoding='utf-8', errors='replace')
+            f_in = open(input_file, 'r', newline='', encoding='utf-8', errors='replace')
 
-        reader = None
-        header = []
-        if file_type == 'csv':
-            reader = csv.reader(f_in)
-            header = next(reader, None)
-            if header is not None:
-                # Auto-detect email column from header
-                if email_column == 0 and header[0].lower().strip() != 'email':
-                    for i, col in enumerate(header):
-                        col_lower = col.lower().strip()
-                        # Match "email" but not "email domain", "email type", etc.
-                        if col_lower == 'email' or col_lower == 'e-mail' or col_lower == 'email_address' or col_lower == 'email address':
-                            email_column = i
-                            break
-                    # Fallback: look for any column containing '@' in the first data row
-                    if email_column == 0 and header[0].lower().strip() != 'email':
-                        peek_row = next(reader, None)
-                        if peek_row:
-                            for i, val in enumerate(peek_row):
-                                if '@' in str(val):
-                                    email_column = i
-                                    break
-                            # Put the peeked row back by re-chaining it
-                            reader = itertools.chain([peek_row], reader)
-                    if email_column > 0:
-                        print(f"📧 Auto-detected email column: '{header[email_column]}' (index {email_column})")
-
-                # Auto-detect engagement columns from header
-                header_map = {col.lower().strip(): i for i, col in enumerate(header)}
-                for name in ['time since last engagement', 'last engagement time', 'engagement time', 'time since engagement']:
-                    if name in header_map:
-                        engagement_col = header_map[name]
-                        break
-                for name in ['opens', 'open count', 'total opens']:
-                    if name in header_map:
-                        opens_col = header_map[name]
-                        break
-                for name in ['clicks', 'click count', 'total clicks']:
-                    if name in header_map:
-                        clicks_col = header_map[name]
-                        break
-                if engagement_col >= 0:
-                    print(f"📊 Auto-detected engagement column: '{header[engagement_col]}' (index {engagement_col})")
-                if opens_col >= 0 or clicks_col >= 0:
-                    print(f"📊 Auto-detected opens/clicks columns: opens={opens_col}, clicks={clicks_col}")
-        else:
-            reader = f_in
-
-        total_rows_processed = 0
-        chunk_index = 1
-        domain_results: Dict[str, dict] = {}
-        
-        if skip_rows > 0:
-            print(f"⏩ Fast-forwarding and skipping the first {skip_rows} rows...")
-            for _ in range(skip_rows):
-                try:
-                    next(reader)
-                    total_rows_processed += 1
-                except StopIteration:
-                    break
-        
-        while True:
-            chunk_rows = []
-            try:
-                for _ in range(chunk_size):
-                    row = next(reader)
-                    chunk_rows.append(row)
-            except StopIteration:
-                pass
-
-            if not chunk_rows:
-                break
-
-            total_rows_processed += len(chunk_rows)
-            
-            # Extract unique domains in this chunk
-            chunk_domains = set()
-            for row in chunk_rows:
-                if file_type == 'csv':
-                    entry = row[email_column] if len(row) > email_column else ""
-                else:
-                    entry = row.strip() if isinstance(row, str) else ""
-                
-                if entry:
-                    d = self.extract_domain(entry)
-                    if d:
-                        chunk_domains.add(d)
-            
-            # Filter domains we need to process (not in cache)
-            domains_to_process = [d for d in chunk_domains if DOMAIN_RESULT_CACHE.get(d) is None]
-            
-            if domains_to_process:
-                print(f"\r⏳ Chunk {chunk_index} | Rows: {total_rows_processed} | New Domains: {len(domains_to_process)}...", end='')
-                tasks = [asyncio.create_task(self.process_domain_pipeline(d)) for d in domains_to_process]
-                
-                chunk_results = []
-                completed_in_chunk = 0
-                total_in_chunk = len(tasks)
-                for coro in asyncio.as_completed(tasks):
-                    res = await coro
-                    chunk_results.append(res)
-                    # Cache the result
-                    DOMAIN_RESULT_CACHE.set(res["domain"], res)
-                    domain_results[res["domain"]] = res
-                    
-                    completed_in_chunk += 1
-                    if completed_in_chunk % 50 == 0 or completed_in_chunk == total_in_chunk:
-                         print(f"\r⏳ Chunk {chunk_index} | Rows: {total_rows_processed} | Domains: {completed_in_chunk}/{total_in_chunk} ({(completed_in_chunk/total_in_chunk)*100:.1f}%)", end='')
-            else:
-                 print(f"\r⏳ Chunk {chunk_index} | Rows: {total_rows_processed} | All domains cached...", end='')
-                
-            chunk_index += 1
-            
-            # Reset resolver periodically to prevent underlying pycares C-level file descriptor exhaust
-            self.resolver = None
-            await self.setup()
-
-        # Pull cached results for domains that were already known before this run
-        for key in list(DOMAIN_RESULT_CACHE.cache.keys()):
-            value = DOMAIN_RESULT_CACHE.get(key)
-            if isinstance(value, dict) and value.get("domain"):
-                domain_results[value["domain"]] = value
-
-        cohort_summary = self.finalize_domain_results(domain_results)
-
-        with open(domain_output_csv, 'w', newline='', encoding='utf-8') as f_domain:
-            domain_writer = csv.DictWriter(f_domain, fieldnames=fieldnames_domain)
-            domain_writer.writeheader()
-            for domain in sorted(domain_results):
-                domain_writer.writerow(domain_results[domain])
-
-        # Re-open input and write final email-level CSV with enriched domain signals
-        with open(email_output_csv, 'w', newline='', encoding='utf-8') as f_email:
-            email_writer = csv.writer(f_email)
+            reader = None
+            header = []
             if file_type == 'csv':
-                email_writer.writerow((header or []) + fieldnames_domain + fieldnames_email_flags)
-                f_in_re = open(input_file, 'r', newline='', encoding='utf-8', errors='replace')
-                reader_re = csv.reader(f_in_re)
-                _ = next(reader_re, None)
-                if skip_rows > 0:
-                    for _ in range(skip_rows):
-                        try:
-                            next(reader_re)
-                        except StopIteration:
-                            break
-            else:
-                email_writer.writerow(["email"] + fieldnames_domain + fieldnames_email_flags)
-                f_in_re = open(input_file, 'r', newline='', encoding='utf-8', errors='replace')
-                reader_re = f_in_re
-                if skip_rows > 0:
-                    for _ in range(skip_rows):
-                        try:
-                            next(reader_re)
-                        except StopIteration:
-                            break
+                reader = csv.reader(f_in)
+                header = next(reader, None)
+                if header is not None:
+                    # Auto-detect email column from header
+                    if email_column == 0 and header[0].lower().strip() != 'email':
+                        for i, col in enumerate(header):
+                            col_lower = col.lower().strip()
+                            # Match "email" but not "email domain", "email type", etc.
+                            if col_lower == 'email' or col_lower == 'e-mail' or col_lower == 'email_address' or col_lower == 'email address':
+                                email_column = i
+                                break
+                        # Fallback: look for any column containing '@' in the first data row
+                        if email_column == 0 and header[0].lower().strip() != 'email':
+                            peek_row = next(reader, None)
+                            if peek_row:
+                                for i, val in enumerate(peek_row):
+                                    if '@' in str(val):
+                                        email_column = i
+                                        break
+                                # Put the peeked row back by re-chaining it
+                                reader = itertools.chain([peek_row], reader)
+                        if email_column > 0:
+                            print(f"📧 Auto-detected email column: '{header[email_column]}' (index {email_column})")
 
-            try:
-                for row in reader_re:
+                    # Auto-detect engagement columns from header
+                    header_map = {col.lower().strip(): i for i, col in enumerate(header)}
+                    for name in ['time since last engagement', 'last engagement time', 'engagement time', 'time since engagement']:
+                        if name in header_map:
+                            engagement_col = header_map[name]
+                            break
+                    for name in ['opens', 'open count', 'total opens']:
+                        if name in header_map:
+                            opens_col = header_map[name]
+                            break
+                    for name in ['clicks', 'click count', 'total clicks']:
+                        if name in header_map:
+                            clicks_col = header_map[name]
+                            break
+                    if engagement_col >= 0:
+                        print(f"📊 Auto-detected engagement column: '{header[engagement_col]}' (index {engagement_col})")
+                    if opens_col >= 0 or clicks_col >= 0:
+                        print(f"📊 Auto-detected opens/clicks columns: opens={opens_col}, clicks={clicks_col}")
+            else:
+                reader = f_in
+
+            total_rows_processed = 0
+            chunk_index = 1
+            domain_results: Dict[str, dict] = {}
+            
+            if skip_rows > 0:
+                print(f"⏩ Fast-forwarding and skipping the first {skip_rows} rows...")
+                for _ in range(skip_rows):
+                    try:
+                        next(reader)
+                        total_rows_processed += 1
+                    except StopIteration:
+                        break
+            
+            while True:
+                chunk_rows = []
+                try:
+                    for _ in range(chunk_size):
+                        row = next(reader)
+                        chunk_rows.append(row)
+                except StopIteration:
+                    pass
+
+                if not chunk_rows:
+                    break
+
+                total_rows_processed += len(chunk_rows)
+                
+                # Extract unique domains in this chunk
+                chunk_domains = set()
+                for row in chunk_rows:
                     if file_type == 'csv':
                         entry = row[email_column] if len(row) > email_column else ""
-                        out_row = list(row)
                     else:
                         entry = row.strip() if isinstance(row, str) else ""
-                        out_row = [entry]
-
+                    
                     if entry:
                         d = self.extract_domain(entry)
-                        res = domain_results.get(d) if d else None
-                        if res:
-                            out_row.extend([res.get(k, "") for k in fieldnames_domain])
+                        if d:
+                            chunk_domains.add(d)
+                
+                # Filter domains we need to process (not in cache)
+                domains_to_process = [d for d in chunk_domains if DOMAIN_RESULT_CACHE.get(d) is None]
+                
+                if domains_to_process:
+                    print(f"\r⏳ Chunk {chunk_index} | Rows: {total_rows_processed} | New Domains: {len(domains_to_process)}...", end='')
+                    tasks = [asyncio.create_task(self.process_domain_pipeline(d)) for d in domains_to_process]
+                    
+                    completed_in_chunk = 0
+                    total_in_chunk = len(tasks)
+                    for coro in asyncio.as_completed(tasks):
+                        res = await coro
+                        DOMAIN_RESULT_CACHE.set(res["domain"], res)
+                        domain_results[res["domain"]] = res
+                        
+                        completed_in_chunk += 1
+                        if completed_in_chunk % 50 == 0 or completed_in_chunk == total_in_chunk:
+                             print(f"\r⏳ Chunk {chunk_index} | Rows: {total_rows_processed} | Domains: {completed_in_chunk}/{total_in_chunk} ({(completed_in_chunk/total_in_chunk)*100:.1f}%)", end='')
+                else:
+                     print(f"\r⏳ Chunk {chunk_index} | Rows: {total_rows_processed} | All domains cached...", end='')
+                    
+                chunk_index += 1
+                
+                # Reset resolver periodically to prevent underlying pycares C-level file descriptor exhaust
+                self.resolver = None
+                await self.setup()
+
+            # Pull cached results for domains that were already known before this run
+            for key in list(DOMAIN_RESULT_CACHE.cache.keys()):
+                value = DOMAIN_RESULT_CACHE.get(key)
+                if isinstance(value, dict) and value.get("domain"):
+                    domain_results[value["domain"]] = value
+
+            cohort_summary = self.finalize_domain_results(domain_results)
+
+            with open(domain_output_csv, 'w', newline='', encoding='utf-8') as f_domain:
+                domain_writer = csv.DictWriter(f_domain, fieldnames=fieldnames_domain, extrasaction='ignore')
+                domain_writer.writeheader()
+                for domain in sorted(domain_results):
+                    domain_writer.writerow(domain_results[domain])
+
+            # Re-open input and write final email-level CSV with enriched domain signals
+            with open(email_output_csv, 'w', newline='', encoding='utf-8') as f_email:
+                email_writer = csv.writer(f_email)
+                if file_type == 'csv':
+                    email_writer.writerow((header or []) + fieldnames_domain + fieldnames_email_flags)
+                    f_in_re = open(input_file, 'r', newline='', encoding='utf-8', errors='replace')
+                    reader_re = csv.reader(f_in_re)
+                    _ = next(reader_re, None)
+                    if skip_rows > 0:
+                        for _ in range(skip_rows):
+                            try:
+                                next(reader_re)
+                            except StopIteration:
+                                break
+                else:
+                    email_writer.writerow(["email"] + fieldnames_domain + fieldnames_email_flags)
+                    f_in_re = open(input_file, 'r', newline='', encoding='utf-8', errors='replace')
+                    reader_re = f_in_re
+                    if skip_rows > 0:
+                        for _ in range(skip_rows):
+                            try:
+                                next(reader_re)
+                            except StopIteration:
+                                break
+
+                try:
+                    for row in reader_re:
+                        if file_type == 'csv':
+                            entry = row[email_column] if len(row) > email_column else ""
+                            out_row = list(row)
+                        else:
+                            entry = row.strip() if isinstance(row, str) else ""
+                            out_row = [entry]
+
+                        if entry:
+                            d = self.extract_domain(entry)
+                            res = domain_results.get(d) if d else None
+                            if res:
+                                out_row.extend([res.get(k, "") for k in fieldnames_domain])
+                            else:
+                                out_row.extend([""] * len(fieldnames_domain))
+
+                            email_flags = self.assess_email_flags(
+                                entry, row if file_type == 'csv' else [],
+                                header if file_type == 'csv' else [],
+                                engagement_col, opens_col, clicks_col,
+                                res
+                            )
+                            out_row.extend([email_flags.get(k, "") for k in fieldnames_email_flags])
                         else:
                             out_row.extend([""] * len(fieldnames_domain))
+                            out_row.extend([""] * len(fieldnames_email_flags))
 
-                        email_flags = self.assess_email_flags(
-                            entry, row if file_type == 'csv' else [],
-                            header if file_type == 'csv' else [],
-                            engagement_col, opens_col, clicks_col,
-                            res
-                        )
-                        out_row.extend([email_flags.get(k, "") for k in fieldnames_email_flags])
-                    else:
-                        out_row.extend([""] * len(fieldnames_domain))
-                        out_row.extend([""] * len(fieldnames_email_flags))
+                        email_writer.writerow(out_row)
+                finally:
+                    f_in_re.close()
 
-                    email_writer.writerow(out_row)
-            finally:
-                f_in_re.close()
+            self.write_review_outputs(domain_results, review_output_csv, cluster_output_csv, cohort_output_json, cohort_summary)
+            self.write_history(domain_results)
 
-        self.write_review_outputs(domain_results, review_output_csv, cluster_output_csv, cohort_output_json, cohort_summary)
-        self.write_history(domain_results)
-
-        print("\n")
-        print("\n🎉 Analysis Complete!")
-        print(f"   ✅ Total rows processed: {total_rows_processed}")
-        print(f"   📄 Domain-level results saved to: {domain_output_csv}")
-        print(f"   📄 Email-level results saved to:  {email_output_csv}")
-        print(f"   📄 Review queue saved to:         {review_output_csv}")
-        print(f"   📄 Cluster summary saved to:      {cluster_output_csv}")
-        print(f"   📄 Cohort summary saved to:       {cohort_output_json}")
-        print(f"   Cache stats: {self.cache_hits} hits, {self.cache_misses} misses")
-        
-        f_in.close()
-        await self.cleanup()
+            print("\n")
+            print("\n🎉 Analysis Complete!")
+            print(f"   ✅ Total rows processed: {total_rows_processed}")
+            print(f"   📄 Domain-level results saved to: {domain_output_csv}")
+            print(f"   📄 Email-level results saved to:  {email_output_csv}")
+            print(f"   📄 Review queue saved to:         {review_output_csv}")
+            print(f"   📄 Cluster summary saved to:      {cluster_output_csv}")
+            print(f"   📄 Cohort summary saved to:       {cohort_output_json}")
+            print(f"   Cache stats: {self.cache_hits} hits, {self.cache_misses} misses")
+        finally:
+            if f_in:
+                f_in.close()
+            await self.cleanup()
 
 
 # --------------------------------------------------------
