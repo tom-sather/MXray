@@ -17,3 +17,7 @@ __pycache__/
 
 # Local run history
 mxray_history.jsonl
+
+# Local test/input data
+test.csv
+test_input.txt

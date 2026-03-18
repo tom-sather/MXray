@@ -239,3 +239,14 @@ Each run also writes:
 - `*_cluster_summary_*.csv` — MX-family cluster rollup
 - `*_cohort_summary_*.json` — Run-level anomaly summary
 - `mxray_history.jsonl` — Local append-only history file created on first run and used for change detection in future runs
+
+## Repo Layout
+
+Primary project files live at the repo root.
+
+- `MXray.py` — main analyzer
+- `README.md` — current documentation
+- `mx_rules.json` — MX provider/risk rules
+- `domain_allowlist.csv` / `domain_known_bad.csv` / `domain_suppressions.csv` — local tuning inputs
+
+Older prototype scripts and historical docs are kept in [`legacy/`](/Users/tomsather/scripts/github/NewMXTool/legacy).
