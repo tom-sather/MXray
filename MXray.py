@@ -455,6 +455,62 @@ class EmailDomainAnalyzer:
         ts = datetime.now().strftime('%Y%m%d_%H%M%S')
         return f"{base}_analysis_{ts}_{PROCESS_ID}.csv"
 
+    def detect_email_column(self, header: List[str], peek_row: Optional[list]) -> Tuple[int, str]:
+        if not header:
+            return 0, ""
+
+        normalized = [str(col).lower().strip() for col in header]
+
+        exact_candidates = [
+            "email", "e-mail", "email_address", "email address",
+            "recipient", "recipient_email", "recipient email",
+            "envelope.targets", "envelope.target",
+            "mailingList.address".lower()
+        ]
+        for candidate in exact_candidates:
+            if candidate in normalized:
+                return normalized.index(candidate), header[normalized.index(candidate)]
+
+        domain_candidates = [
+            "recipientdomain", "recipient_domain", "recipient domain",
+            "domain", "domain.name"
+        ]
+        for candidate in domain_candidates:
+            if candidate in normalized:
+                return normalized.index(candidate), header[normalized.index(candidate)]
+
+        weighted_contains = [
+            ("recipient", 100),
+            ("target", 90),
+            ("email", 80),
+            ("domain", 40),
+            ("sender", -50),
+            ("from", -30),
+            ("envelope.sender", -80),
+        ]
+        best_index = -1
+        best_score = -10**9
+        for i, col in enumerate(normalized):
+            score = 0
+            for token, weight in weighted_contains:
+                if token in col:
+                    score += weight
+            if score > best_score:
+                best_score = score
+                best_index = i
+        if best_index >= 0 and best_score > 0:
+            return best_index, header[best_index]
+
+        if peek_row:
+            for i, val in enumerate(peek_row):
+                if '@' in str(val):
+                    return i, header[i] if i < len(header) else ""
+            for i, val in enumerate(peek_row):
+                if self.extract_domain(str(val)):
+                    return i, header[i] if i < len(header) else ""
+
+        return 0, header[0]
+
     # ----------------- DNS: MX / A / TXT (SPF/DMARC) / NS -----------------
 
     async def _resolve_with_retry(self, domain: str, qtype: str, max_retries: int = 2):
@@ -1661,7 +1717,7 @@ class EmailDomainAnalyzer:
         result["risk_factors"] = " | ".join(risk_factors)
         return result
 
-    async def process_entries_async(self, input_file: str, file_type: str, email_column: int, output_csv: str, chunk_size: int = 50000, skip_rows: int = 0):
+    async def process_entries_async(self, input_file: str, file_type: str, email_column: int, output_csv: str, chunk_size: int = 50000, skip_rows: int = 0, email_column_name: str = ""):
         await self.setup()
 
         domain_output_csv = output_csv.replace('_analysis_', '_domain_analysis_')
@@ -1716,29 +1772,22 @@ class EmailDomainAnalyzer:
                 reader = csv.reader(f_in)
                 header = next(reader, None)
                 if header is not None:
-                    # Auto-detect email column from header
-                    if email_column == 0 and header[0].lower().strip() != 'email':
-                        for i, col in enumerate(header):
-                            col_lower = col.lower().strip()
-                            # Match "email" but not "email domain", "email type", etc.
-                            if col_lower == 'email' or col_lower == 'e-mail' or col_lower == 'email_address' or col_lower == 'email address':
-                                email_column = i
-                                break
-                        # Fallback: look for any column containing '@' in the first data row
-                        if email_column == 0 and header[0].lower().strip() != 'email':
-                            peek_row = next(reader, None)
-                            if peek_row:
-                                for i, val in enumerate(peek_row):
-                                    if '@' in str(val):
-                                        email_column = i
-                                        break
-                                # Put the peeked row back by re-chaining it
-                                reader = itertools.chain([peek_row], reader)
-                        if email_column > 0:
-                            print(f"📧 Auto-detected email column: '{header[email_column]}' (index {email_column})")
+                    header_map = {str(col).lower().strip(): i for i, col in enumerate(header)}
+                    peek_row = None
+                    if email_column_name:
+                        lookup = email_column_name.lower().strip()
+                        if lookup not in header_map:
+                            raise ValueError(f"Column '{email_column_name}' not found in CSV header")
+                        email_column = header_map[lookup]
+                        print(f"📧 Using requested column: '{header[email_column]}' (index {email_column})")
+                    elif email_column == 0 and header[0].lower().strip() != 'email':
+                        peek_row = next(reader, None)
+                        if peek_row:
+                            reader = itertools.chain([peek_row], reader)
+                        email_column, detected_name = self.detect_email_column(header, peek_row)
+                        print(f"📧 Auto-detected analysis column: '{detected_name}' (index {email_column})")
 
                     # Auto-detect engagement columns from header
-                    header_map = {col.lower().strip(): i for i, col in enumerate(header)}
                     for name in ['time since last engagement', 'last engagement time', 'engagement time', 'time since engagement']:
                         if name in header_map:
                             engagement_col = header_map[name]
@@ -1954,6 +2003,11 @@ def main():
             "--whois",
             action="store_true",
             help="Enable WHOIS / registry-age enrichment for organizational domains"
+        )
+        parser.add_argument(
+            "--column",
+            dest="email_column_name",
+            help="CSV column name to analyze, e.g. recipient or recipientDomain"
         )
         args = parser.parse_args()
 
